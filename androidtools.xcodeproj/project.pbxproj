@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A304105724CE98FA003EF34C /* ConfigsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A304105624CE98FA003EF34C /* ConfigsHelper.swift */; };
+		A304105924CED7E8003EF34C /* CommandRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A304105824CED7E8003EF34C /* CommandRunner.swift */; };
+		A34F757824CA8820008F54AE /* BundleAppInstallHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A34F757724CA8820008F54AE /* BundleAppInstallHelper.swift */; };
+		A34F757D24CAD688008F54AE /* ResourceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A34F757924CAD1BE008F54AE /* ResourceHelper.swift */; };
+		A34F757E24CAD822008F54AE /* FileHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A34F757B24CAD3DD008F54AE /* FileHelper.swift */; };
+		A34F75A724CAE259008F54AE /* platform-tools in Resources */ = {isa = PBXBuildFile; fileRef = A34F75A624CAE259008F54AE /* platform-tools */; };
+		A34F75AB24CAE59E008F54AE /* bundletool.jar in Resources */ = {isa = PBXBuildFile; fileRef = A34F75A924CAE529008F54AE /* bundletool.jar */; };
 		A387493E24C6F697000A4E9A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A387493D24C6F697000A4E9A /* AppDelegate.swift */; };
 		A387494024C6F697000A4E9A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A387493F24C6F697000A4E9A /* ViewController.swift */; };
 		A387494224C6F698000A4E9A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A387494124C6F698000A4E9A /* Assets.xcassets */; };
@@ -14,6 +21,14 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		A304105624CE98FA003EF34C /* ConfigsHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigsHelper.swift; sourceTree = "<group>"; };
+		A304105824CED7E8003EF34C /* CommandRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandRunner.swift; sourceTree = "<group>"; };
+		A34F757724CA8820008F54AE /* BundleAppInstallHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundleAppInstallHelper.swift; sourceTree = "<group>"; };
+		A34F757924CAD1BE008F54AE /* ResourceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceHelper.swift; sourceTree = "<group>"; };
+		A34F757B24CAD3DD008F54AE /* FileHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileHelper.swift; sourceTree = "<group>"; };
+		A34F757F24CADA51008F54AE /* Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Header.h; sourceTree = "<group>"; };
+		A34F75A624CAE259008F54AE /* platform-tools */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "platform-tools"; sourceTree = "<group>"; };
+		A34F75A924CAE529008F54AE /* bundletool.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = bundletool.jar; sourceTree = "<group>"; };
 		A387493A24C6F697000A4E9A /* androidtools.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = androidtools.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A387493D24C6F697000A4E9A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A387493F24C6F697000A4E9A /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -34,6 +49,27 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A34F757624CA87DF008F54AE /* utils */ = {
+			isa = PBXGroup;
+			children = (
+				A34F757724CA8820008F54AE /* BundleAppInstallHelper.swift */,
+				A34F757924CAD1BE008F54AE /* ResourceHelper.swift */,
+				A34F757B24CAD3DD008F54AE /* FileHelper.swift */,
+				A304105624CE98FA003EF34C /* ConfigsHelper.swift */,
+				A304105824CED7E8003EF34C /* CommandRunner.swift */,
+			);
+			path = utils;
+			sourceTree = "<group>";
+		};
+		A34F758024CAE0E9008F54AE /* libs */ = {
+			isa = PBXGroup;
+			children = (
+				A34F75A924CAE529008F54AE /* bundletool.jar */,
+				A34F75A624CAE259008F54AE /* platform-tools */,
+			);
+			path = libs;
+			sourceTree = "<group>";
+		};
 		A387493124C6F697000A4E9A = {
 			isa = PBXGroup;
 			children = (
@@ -53,12 +89,15 @@
 		A387493C24C6F697000A4E9A /* androidtools */ = {
 			isa = PBXGroup;
 			children = (
+				A34F758024CAE0E9008F54AE /* libs */,
+				A34F757624CA87DF008F54AE /* utils */,
 				A387493D24C6F697000A4E9A /* AppDelegate.swift */,
 				A387493F24C6F697000A4E9A /* ViewController.swift */,
 				A387494124C6F698000A4E9A /* Assets.xcassets */,
 				A387494324C6F698000A4E9A /* Main.storyboard */,
 				A387494624C6F698000A4E9A /* Info.plist */,
 				A387494724C6F698000A4E9A /* androidtools.entitlements */,
+				A34F757F24CADA51008F54AE /* Header.h */,
 			);
 			path = androidtools;
 			sourceTree = "<group>";
@@ -121,8 +160,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A34F75AB24CAE59E008F54AE /* bundletool.jar in Resources */,
 				A387494224C6F698000A4E9A /* Assets.xcassets in Resources */,
 				A387494524C6F698000A4E9A /* Main.storyboard in Resources */,
+				A34F75A724CAE259008F54AE /* platform-tools in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -134,7 +175,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				A387494024C6F697000A4E9A /* ViewController.swift in Sources */,
+				A304105724CE98FA003EF34C /* ConfigsHelper.swift in Sources */,
+				A34F757824CA8820008F54AE /* BundleAppInstallHelper.swift in Sources */,
 				A387493E24C6F697000A4E9A /* AppDelegate.swift in Sources */,
+				A34F757D24CAD688008F54AE /* ResourceHelper.swift in Sources */,
+				A34F757E24CAD822008F54AE /* FileHelper.swift in Sources */,
+				A304105924CED7E8003EF34C /* CommandRunner.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -272,13 +318,17 @@
 				CODE_SIGN_ENTITLEMENTS = androidtools/androidtools.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 3;
 				INFOPLIST_FILE = androidtools/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.didikee.androidtools;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/androidtools/Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -290,13 +340,17 @@
 				CODE_SIGN_ENTITLEMENTS = androidtools/androidtools.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 3;
 				INFOPLIST_FILE = androidtools/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.didikee.androidtools;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/androidtools/Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
