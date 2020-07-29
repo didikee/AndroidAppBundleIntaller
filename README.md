@@ -70,5 +70,29 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.45-b02, mixed mode)
 
 在安装过程中产生的apks文件存放在 `/Users/{你的Mac用户名}/Downloads/Android/apks/`
 
+按照官方文档，当我们需要装.aab文件时，我们需要经过两个步骤：
+
+1. 将.aab 转为 .apks
+2. 使用bundletool.jar 工具将.apks 安装到安卓手机上
+
+这两个步骤对应的命令：
+
+1.将.aab 转为 .apks
+```
+ java -jar /Users/dev/Downloads/bundletool.jar build-apks 
+ --bundle=/Users/dev/Downloads/release/demoapp.aab 
+ --output=/Users/dev/Downloads/lunaon/release/demoapp.apks 
+ --ks=/Users/dev/Android/app/keystore/demoapp.jks 
+ --ks-pass=pass:passwaord
+ --ks-key-alias=alias
+ --key-pass=pass:passwaord
+```
+
+使用bundletool.jar 工具将.apks 安装到安卓手机上
+```
+java -jar /Users/dev/Downloads/bundletool.jar install-apks --apks=/Users/dev/Downloads/release/demoapp.apks
+
+```
+具体的文件请参见源码的[shell](https://github.com/didikee/AndroidAppBundleIntaller/tree/master/shell)文件夹.
 
 
