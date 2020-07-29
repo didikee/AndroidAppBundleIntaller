@@ -38,6 +38,7 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.45-b02, mixed mode)
 
 三星手机：
 进入安卓手机的`设置--> 关于手机 --> 点击编译编号7次`开启开发者选项
+
 在`设置-->开发者选项-->USB调试`，将`USB调试`的开关切换到开启的状态
 
 **在开启USB调试模式后连接电脑会弹出”USB允许调试“的询问对话框，请勾选”一律允许使用这台计算机进行调试“避免每次连接手机都要询问。**
@@ -48,8 +49,7 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.45-b02, mixed mode)
 打开工具后的页面如下图：
 ![软件页面](pics/tool_main_page.png)
 
-先配置签名信息（默认会记住上次填写的信息）
-然后选择一个 AppBundle文件点击安装按钮开始安装。
+先配置签名信息（默认会记住上次填写的信息），然后选择一个 AppBundle文件点击安装按钮开始安装。
 
 ## 已知问题（待解决）
 
@@ -67,6 +67,7 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.45-b02, mixed mode)
 ## 关于
 
 本工具的初衷是给不熟悉命令的测试人员能够以图形化的形式安装.aab文件到安卓手机。
+
 在安装过程中产生的apks文件存放在 `/Users/{你的Mac用户名}/Downloads/Android/apks/`
 
 
