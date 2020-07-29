@@ -51,7 +51,7 @@ class ViewController: NSViewController {
     // MARK: - ui action
     
     @IBAction func submitBtnClick(_ sender: Any) {
-        // installApp 
+        // installApp
         btInstall.isEnabled = false
         self.progressBar.isHidden = false
         self.progressBar.startAnimation(sender)
@@ -70,7 +70,6 @@ class ViewController: NSViewController {
                 self.showInstallFinishDialog(startTime)
             }
         }
-        
     }
     
     @IBAction func selectBundleJarFile(_ sender: Any) {
@@ -153,7 +152,11 @@ class ViewController: NSViewController {
         let spent = CFAbsoluteTimeGetCurrent() - start
         let alert = NSAlert()
         alert.messageText = "安装结束"
-        alert.informativeText = "本次安装耗时：\(spent) 秒"
+        alert.informativeText = """
+        本次安装耗时：\(Int(spent)) 秒, 请查看手机确认是否安装成功。
+        
+        如果安装失败请查看注意事项获取更多帮助。
+        """
         alert.alertStyle = .warning
         alert.addButton(withTitle: "好的")
         alert.runModal()
@@ -254,9 +257,10 @@ class ViewController: NSViewController {
                 
                 let task = Process()
 
-                task.launchPath = "/bin/sh"
+                task.launchPath = "/bin/bash"
                 //task.arguments = ["-c", "echo 1 ; sleep 1 ; echo 2 ; sleep 1 ; echo 3 ; sleep 1 ; echo 4"]
-                task.arguments = ["-c", "java -version"]
+                // task.arguments = ["-c", "java -version"]
+        task.arguments = ["-c", "adb devices"]
 
                 let pipe = Pipe()
                 task.standardOutput = pipe
