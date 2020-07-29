@@ -8,6 +8,8 @@
 
 ## 如何使用
 
+**前三个步骤对应的设备只需要第一次配置好，以后就不用重复配置了。**
+
 ### 第一步：安装JDK
 
 进入 oracle官网的JDK下载页：[https://www.oracle.com/java/technologies/javase-downloads.html](https://www.oracle.com/java/technologies/javase-downloads.html)
