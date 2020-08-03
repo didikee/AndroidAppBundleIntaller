@@ -12,6 +12,7 @@ class ViewController: NSViewController {
     @IBOutlet weak var bundleToolPath: NSTextField!
     @IBOutlet weak var inputAndroidAabFilePath: NSTextField!
     @IBOutlet weak var inputSignFilePath: NSTextFieldCell!
+    @IBOutlet weak var textProcessMessage: NSTextField!
     
     @IBOutlet weak var textSignPwd: NSTextFieldCell!
     @IBOutlet weak var textAlias: NSTextField!
@@ -51,6 +52,38 @@ class ViewController: NSViewController {
     // MARK: - ui action
     
     @IBAction func submitBtnClick(_ sender: Any) {
+        // check params in main thread
+        let aabFilePath = self.inputAndroidAabFilePath.stringValue;
+        let signFilePath = self.inputSignFilePath.stringValue;
+         
+         let signPwd = self.textSignPwd.stringValue;
+         let alias = self.textAlias.stringValue
+         let aliasPwd = self.textAliasPwd.stringValue
+         
+         if signFilePath.isEmpty {
+             showErrorDialog("请选择签名文件(.jks)")
+             return
+         }
+         
+         if signPwd.isEmpty {
+             showErrorDialog("请输入签名密码")
+             return
+         }
+         if alias.isEmpty {
+             showErrorDialog("请输入别名")
+             return
+         }
+         if aliasPwd.isEmpty {
+             showErrorDialog("请输入别名密码")
+             return
+         }
+         
+         if aabFilePath.isEmpty {
+             showErrorDialog("请选择安卓安装文件(.aab)")
+             return
+         }
+         // save configs
+         ConfigsHelper.setConfigs(signFilePath, signPwd: signPwd, alias: alias, aliasPwd: aliasPwd)
         // installApp
         btInstall.isEnabled = false
         self.progressBar.isHidden = false
@@ -59,17 +92,87 @@ class ViewController: NSViewController {
 
         DispatchQueue.global().async {
             // working
-            //sleep(5)
-            self.installApp()
-            
-            DispatchQueue.main.async {
-                self.btInstall.isEnabled = true
-                self.progressBar.isHidden = true
-                self.progressBar.stopAnimation(sender)
+            // check java version
+            BundleAppInstallHelper.clearFileContent(self.getLogFile())
+            print(self.getLogFile().path)
+            BundleAppInstallHelper.shell(BundleAppInstallHelper.getJavaVersionCmd(self.getLogFile()))
+            let javaVersion = BundleAppInstallHelper.getJavaVersionFromLog(self.getFileContent(self.getLogFile()))
+            if javaVersion.isEmpty{
+                DispatchQueue.main.async {
+                    self.btInstall.isEnabled = true
+                    self.progressBar.isHidden = true
+                    self.progressBar.stopAnimation(sender)
 
-                self.showInstallFinishDialog(startTime)
+                    self.showErrorDialog("检测到JDK未安装，请在浏览器中搜索JDK并安装。")
+                }
+                return
+            }
+            // check connect devices
+            BundleAppInstallHelper.clearFileContent(self.getLogFile())
+            BundleAppInstallHelper.shell(BundleAppInstallHelper.getAdbDevicesCmd(self.getLogFile()))
+            let deviceCount = BundleAppInstallHelper.getDeviceCountFromLog(self.getFileContent(self.getLogFile()))
+            if deviceCount > 1{
+                DispatchQueue.main.async {
+                    self.btInstall.isEnabled = true
+                    self.progressBar.isHidden = true
+                    self.progressBar.stopAnimation(sender)
+
+                    self.showErrorDialog("检测到多台连接设备，请移除多余设备并确保只有一台设备连接。")
+                }
+                return
+            }
+            if deviceCount < 1 {
+                DispatchQueue.main.async {
+                    self.btInstall.isEnabled = true
+                    self.progressBar.isHidden = true
+                    self.progressBar.stopAnimation(sender)
+
+                    self.showErrorDialog("请连接安卓手机。如果你已经连接了安卓手机，请开启开发者选中的USB调试模式。")
+                }
+                return
+            }
+            // 执行安装程序
+            BundleAppInstallHelper.clearFileContent(self.getLogFile())
+            
+            // bundletool.jar 和 adb 地址
+            let currentAppContentPath = ResourceHelper.getCurrentAppContentPath()
+            let bundlejar = currentAppContentPath + "/Resources/bundletool.jar"
+            let adb = currentAppContentPath + "/Resources/platform-tools/adb"
+            
+            //get apks filename from aab
+              let aabUrl = URL(fileURLWithPath: aabFilePath)
+              let apksFilename = aabUrl.deletingPathExtension()
+                  .appendingPathExtension("apks")
+                  .lastPathComponent
+              
+             // print("kkk:\(apksFilename)")
+            self.updateProcessMessage("正在转换AppBundle...", error: false)
+            let apksFile = self.bundle2apks(aabFilePath, signFilePath:signFilePath,signPwd: signPwd,alias: alias,aliasPwd: aliasPwd,bundlejar: bundlejar,adb: adb,apksFilename: apksFilename)
+            if FileManager.default.fileExists(atPath: apksFile.path) {
+                // continue
+                self.updateProcessMessage("正在安装apks...", error: false)
+                self.installApks2Device(apksFilename, bundlejar: bundlejar, adb: adb)
+                self.updateProcessMessage("完成", error: false)
+                DispatchQueue.main.async {
+                    self.btInstall.isEnabled = true
+                    self.progressBar.isHidden = true
+                    self.progressBar.stopAnimation(sender)
+
+                    self.showInstallFinishDialog(startTime)
+                }
+            }else{
+                self.updateProcessMessage("AppBundle 转换失败！", error: true)
+                // error
+                DispatchQueue.main.async {
+                    self.btInstall.isEnabled = true
+                    self.progressBar.isHidden = true
+                    self.progressBar.stopAnimation(sender)
+
+                    self.showErrorDialog("AppBundle 转换失败！")
+                }
             }
         }
+        // shellTest()
     }
     
     @IBAction func selectBundleJarFile(_ sender: Any) {
@@ -162,13 +265,26 @@ class ViewController: NSViewController {
         alert.runModal()
     }
     
+    // 更新进度内容
+    func updateProcessMessage(_ message: String,error: Bool) {
+        DispatchQueue.main.async {
+            self.textProcessMessage.stringValue = message
+    //        if error {
+    //            self.textProcessMessage.textColor =
+    //        }else{
+    //            self.textProcessMessage.textColor =
+    //        }
+        }
+
+        
+    }
+    
     
     // 设置上次配置
     func setLastConfigs() {
         // init last configs
         let configsDict = ConfigsHelper.getConfigs()
         if !configsDict.isEmpty {
-            print("字典不为空")
             self.inputSignFilePath.stringValue = configsDict[ConfigsHelper.KEY_SIGN_PATH]!
             self.textSignPwd.stringValue = configsDict[ConfigsHelper.KEY_SING_PWD]!
             self.textAlias.stringValue = configsDict[ConfigsHelper.KEY_ALIAS]!
@@ -176,117 +292,81 @@ class ViewController: NSViewController {
         }
     }
     
-    // 安装app
-    func installApp() {
-        let aabFilePath = self.inputAndroidAabFilePath.stringValue;
-        let signFilePath = self.inputSignFilePath.stringValue;
-        let bundleToolJarPath = self.bundleToolPath.stringValue;
-        
-        let signPwd = self.textSignPwd.stringValue;
-        let alias = self.textAlias.stringValue
-        let aliasPwd = self.textAliasPwd.stringValue
-        
-        if signFilePath.isEmpty {
-            showErrorDialog("请选择签名文件(.jks)")
-            return
-        }
-        
-        if signPwd.isEmpty {
-            showErrorDialog("请输入签名密码")
-            return
-        }
-        if alias.isEmpty {
-            showErrorDialog("请输入别名")
-            return
-        }
-        if aliasPwd.isEmpty {
-            showErrorDialog("请输入别名密码")
-            return
-        }
-        
-        if aabFilePath.isEmpty {
-            showErrorDialog("请选择安卓安装文件(.aab)")
-            return
-        }
-        // save configs
-        ConfigsHelper.setConfigs(signFilePath, signPwd: signPwd, alias: alias, aliasPwd: aliasPwd)
-        
-        
-        // bundletool.jar 和 adb 地址
-        let currentAppContentPath = ResourceHelper.getCurrentAppContentPath()
-        let bundlejar = currentAppContentPath + "/Resources/bundletool.jar"
-        let adb = currentAppContentPath + "/Resources/platform-tools/adb"
- 
-        let shell = BundleAppInstallHelper.getInstallShell(bundlejar,aabFilePath: aabFilePath, signFilePath: signFilePath,adbPath: adb);
-
-        BundleAppInstallHelper.shell(shell);
+    // 安卓appbundle
+    func bundle2apks(_ aabFilePath: String,signFilePath: String,
+                     signPwd: String, alias: String, aliasPwd: String,bundlejar: String,adb: String,apksFilename: String) -> URL {
+        let bundle2apksCmd = BundleAppInstallHelper.getBundle2ApksShell(bundlejar,aabFilePath: aabFilePath,
+                                                           signFilePath: signFilePath,adbPath: adb,
+                                                           signPwd: signPwd, alias: alias, aliasPwd: aliasPwd,apksFilename: apksFilename
+        );
+        print("Bundle2ApksCommand:\(bundle2apksCmd)")
+        BundleAppInstallHelper.shell(bundle2apksCmd);
+        return BundleAppInstallHelper.getApksFile(apksFilename)
     }
     
+    func installApks2Device(_ apksFilename:String, bundlejar: String,adb: String) {
+        let installCmd = BundleAppInstallHelper.getIntallApksShell(bundlejar, adbPath: adb, apksFilename: apksFilename)
+        print("installApks2Device Command:\(installCmd)")
+        BundleAppInstallHelper.shell(installCmd)
+    }
+    
+    
+    
     func shellTest() {
-        //        let command = """
-        //        java -version
-        //        """
-        //            let task = Process()
-        //            let pipe = Pipe()
-        //
-        //            task.standardOutput = pipe
-        //            task.arguments = ["-c", command]
-        //            task.launchPath = "/bin/bash"
+
+                DispatchQueue.global().async {
+                    // working
+                    //sleep(5)
+                    let adbLog = """
+                    List of devices attached
+                    R28M22J8MMM    device
+                    ce0816081ca9772604    device
+                    """
                     
-        //            let outputHandle = pipe.fileHandleForReading
-        //            outputHandle.readabilityHandler = { pipe in
-        //                if let line = String(data: pipe.availableData, encoding: String.Encoding.utf8) {
-        //                    // Update your view with the new text here
-        //                    print("New ouput: \(line)")
-        //                } else {
-        //                    print("Error decoding data: \(pipe.availableData)")
-        //
-        //                }
-        //            }
-                
-        //        pipe.fileHandleForReading.readabilityHandler = { fileHandle in
-        //            let data = fileHandle.availableData
-        //            print("received data: \(data.count)")
-        //            print(String(data: data, encoding: .utf8) ?? "")
-        //            // Display the new output appropriately in a NSTextView for example
-        //
-        //        }
-        //         task.launch()
-        //        task.waitUntilExit()
-        //        print("代码结束")
-                
-                let task = Process()
+                    let javaLog = """
+                    java version "1.8.0_45"
+                    Java(TM) SE Runtime Environment (build 1.8.0_45-b14)
+                    Java HotSpot(TM) 64-Bit Server VM (build 25.45-b02, mixed mode)
+                    """
+                    //let count = BundleAppInstallHelper.getDeviceCountFromLog(adbLog)
+                    let version = BundleAppInstallHelper.getJavaVersionFromLog(javaLog)
+                    DispatchQueue.main.async {
+                        // get log file
+//                        let downloadsDirectory = self.getLogFile()
+//                        do{
+//                            let fileContent = try String(contentsOf: downloadsDirectory,encoding: .utf8)
+//                            print(fileContent)
+//                        }catch{
+//                            // do something
+//                        }
+                        print("设备数：\(version)")
+                        
+                    }
+                }
+        
+    }
 
-                task.launchPath = "/bin/bash"
-                //task.arguments = ["-c", "echo 1 ; sleep 1 ; echo 2 ; sleep 1 ; echo 3 ; sleep 1 ; echo 4"]
-                // task.arguments = ["-c", "java -version"]
-        task.arguments = ["-c", "adb devices"]
-
-                let pipe = Pipe()
-                task.standardOutput = pipe
-                //let outHandle = pipe.fileHandleForReading
-                task.launch()
-                
-                let data = pipe.fileHandleForReading.readDataToEndOfFile()
-                let output = String(data: data,encoding: String.Encoding.utf8)!
-        //        var output = String()
-
-        //        outHandle.readabilityHandler = { pipe in
-        //            if let line = String(data: pipe.availableData, encoding: String.Encoding.utf8) {
-        //                // Update your view with the new text here
-        //                if line.count > 0 {
-        //                    bigOutput.append(line)
-        //                }
-        //                // print("New ouput: \(line)")
-        //            } else {
-        //                print("Error decoding data: \(pipe.availableData)")
-        //            }
-        //        }
-
-                
-                //task.waitUntilExit()
-                print("end")
-                print("结束:\(output)")
+    
+    func getLogFile() -> URL {
+        return BundleAppInstallHelper.getLogFile()
+    }
+    
+    func getFileContent(_ file: URL) -> String {
+        if FileManager.default.fileExists(atPath: file.path) {
+            do{
+                print("getFileContent:\(file.path)")
+                let fileContent = try String(contentsOf: file,encoding: .utf8)
+                print("getFileContent:\(fileContent)")
+                return fileContent
+            }catch{
+                // do something
+                print(error)
+            }
+        }else{
+            print("getFileContent error: file not found.")
+        }
+        
+        return ""
     }
 }
 
