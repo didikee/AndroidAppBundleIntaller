@@ -95,7 +95,7 @@ class BundleAppInstallHelper {
         
         echo "正在处理app bundle 转 apks..."
         # app bundle to apks
-        java -jar $bundlejar_location build-apks --bundle=$app_bundle --output=$apks_location --ks=$ks_location --ks-pass=pass:$ks_pwd --ks-key-alias=$ks_alias --key-pass=pass:$ks_alias_pwd --overwrite &> \(OUTPUT_LOG)
+        java -jar $bundlejar_location build-apks --bundle=$app_bundle --output=$apks_location --ks=$ks_location --ks-pass=pass:$ks_pwd --ks-key-alias=$ks_alias --key-pass=pass:$ks_alias_pwd --mode=universal --overwrite &> \(OUTPUT_LOG)
         """
         return shell;
     }
