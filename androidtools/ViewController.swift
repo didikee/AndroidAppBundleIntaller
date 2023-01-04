@@ -89,6 +89,12 @@ class ViewController: NSViewController {
         self.progressBar.isHidden = false
         self.progressBar.startAnimation(sender)
         let startTime = CFAbsoluteTimeGetCurrent()
+        
+        // init android folder
+        let isAndroidFolderExist = FileHelper.checkInitAndroidFodler()
+        if !isAndroidFolderExist {
+            print("Something went wrong,'Android' folder create failed.")
+        }
 
         DispatchQueue.global().async {
             // working

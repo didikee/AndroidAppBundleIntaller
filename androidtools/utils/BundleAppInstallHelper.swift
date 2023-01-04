@@ -73,6 +73,10 @@ class BundleAppInstallHelper {
         return shell;
     }
     
+    // 标准的命令：
+    // java -jar $bundlejar_location build-apks --local-testing --bundle=$app_bundle --output=$apks_location --ks=$ks_location --ks-pass=pass:$ks_pwd --ks-key-alias=$ks_alias --key-pass=pass:$ks_alias_pwd --overwrite &> \(OUTPUT_LOG)
+    // 本地测试命令：
+    //
     static func getBundle2ApksShell(_ bundleToolJarPath: String, aabFilePath: String,signFilePath: String, adbPath: String,
                                     signPwd: String, alias: String, aliasPwd: String, apksFilename: String
     ) -> String {
@@ -95,9 +99,9 @@ class BundleAppInstallHelper {
         
         echo "正在处理app bundle 转 apks..."
         # app bundle to apks
-        java -jar $bundlejar_location build-apks --bundle=$app_bundle --output=$apks_location --ks=$ks_location --ks-pass=pass:$ks_pwd --ks-key-alias=$ks_alias --key-pass=pass:$ks_alias_pwd --mode=universal --overwrite &> \(OUTPUT_LOG)
+        java -jar $bundlejar_location build-apks --bundle=$app_bundle --output=$apks_location --ks=$ks_location --ks-pass=pass:$ks_pwd --ks-key-alias=$ks_alias --key-pass=pass:$ks_alias_pwd --overwrite &> \(OUTPUT_LOG)
         """
-        return shell;
+        return shell;//--mode=universal
     }
     
     static func getTestCommand() -> String{

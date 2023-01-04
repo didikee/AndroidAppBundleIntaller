@@ -1,60 +1,26 @@
-////
-////  FileHelper.swift
-////  androidtools
-////
-////  Created by didikee on 7/24/20.
-////  Copyright © 2020 didikee. All rights reserved.
-////
 //
-//import Foundation
-//import Darwin
+//  FileHelper.swift
+//  androidtools
 //
+//  Created by didikee on 7/24/20.
+//  Copyright © 2020 didikee. All rights reserved.
 //
-//
-//// Call proc_listallpids once with nil/0 args to get the current number of pids
-//let initialNumPids = proc_listallpids(nil, 0)
-//
-//// Allocate a buffer of these number of pids.
-//// Make sure to deallocate it as this class does not manage memory for us.
-//let buffer = UnsafeMutablePointer<pid_t>.allocate(capacity: Int(initialNumPids))
-//defer {
-//    buffer.deallocate()
-//}
-//
-//// Calculate the buffer's total length in bytes
-//let bufferLength = initialNumPids * Int32(MemoryLayout<pid_t>.size)
-//
-//// Call the function again with our inputs now ready
-//let numPids = proc_listallpids(buffer, bufferLength)
-//
-//// Loop through each pid
-//for i in 0..<numPids {
-//    
-//    // Print the current pid
-//    let pid = buffer[Int(i)]
-//    print("[\(i)] \(pid)")
-//    
-//    // Allocate a buffer to store the name
-//    let nameBuffer = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(MAXPATHLEN))
-//    defer {
-//        nameBuffer.deallocate()
-//    }
-//    
-//    // Now get and print the name. Not all processes return a name here...
-//    let nameLength = proc_name(pid, nameBuffer, UInt32(MAXPATHLEN))
-//    if nameLength > 0 {
-//        let name = String(cString: nameBuffer)
-//        print("  name=\(name)")
-//    }
-//    
-//    // ...so also get the process' path
-//    let pathBuffer = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(MAXPATHLEN))
-//    defer {
-//        pathBuffer.deallocate()
-//    }
-//    let pathLength = proc_pidpath(pid, pathBuffer, UInt32(MAXPATHLEN))
-//    if pathLength > 0 {
-//        let path = String(cString: pathBuffer)
-//        print("  path=\(path)")
-//    }
-//}
+
+import Foundation
+import Darwin
+
+class FileHelper {
+    // 检测Android文件夹是否存在，不存在就创建
+    static func checkInitAndroidFodler() -> Bool{
+        var androidFolder = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first!
+        androidFolder.appendPathComponent("Android", isDirectory: true)
+        if !FileManager.default.fileExists(atPath: androidFolder.path) {
+            do {
+                try FileManager.default.createDirectory(atPath: androidFolder.path, withIntermediateDirectories: true, attributes: nil)
+            } catch  {
+                print("FileHelper.checkAndroidFodler error:\(error.localizedDescription)")
+            }
+        }
+        return FileManager.default.fileExists(atPath: androidFolder.path)
+    }
+}
